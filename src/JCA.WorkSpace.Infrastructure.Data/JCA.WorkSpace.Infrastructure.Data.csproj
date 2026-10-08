@@ -16,4 +16,16 @@
     <ProjectReference Include="..\JCA.WorkSpace.Domain\JCA.WorkSpace.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Email\Assets\facilities.png">
+      <LogicalName>email-guides.facilities.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Email\Assets\admin.png">
+      <LogicalName>email-guides.admin.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Email\Assets\gestor.png">
+      <LogicalName>email-guides.gestor.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

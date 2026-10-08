@@ -21,6 +21,9 @@ builder.Services.AddApplication();
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<WelcomeEmailConsumer>();
+    x.AddConsumer<AccessRequestPendingConsumer>();
+    x.AddConsumer<AccessRequestApprovedConsumer>();
+    x.AddConsumer<AccessRequestRejectedConsumer>();
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
