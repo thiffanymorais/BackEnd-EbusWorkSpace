@@ -5,6 +5,7 @@ using JCA.WorkSpace.Infrastructure.Data.Repositories;
 using JCA.WorkSpace.Infrastructure.Data.Contexts;
 using JCA.WorkSpace.Domain.Interfaces;
 using JCA.WorkSpace.Infrastructure.Data.UnitOfWork;
+using JCA.WorkSpace.Infrastructure.Data.Email;
 using Microsoft.EntityFrameworkCore;
 
 namespace JCA.WorkSpace.Infrastructure.CrossCutting.IoC;
@@ -27,6 +28,11 @@ public static class DependencyInjection
         services.AddScoped<IExtensionRequestRepository, ExtensionRequestRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Serviço de E-mail (MailKit)
+        // Em desenvolvimento aponta para Mailpit (localhost:1025)
+        // Em produção, alterar SmtpHost/SmtpPort no appsettings.json
+        services.AddScoped<EmailService>();
 
         return services;
     }

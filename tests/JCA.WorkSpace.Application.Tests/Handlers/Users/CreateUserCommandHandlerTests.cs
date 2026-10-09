@@ -3,6 +3,7 @@ using JCA.WorkSpace.Application.Commands.Users;
 using JCA.WorkSpace.Application.Handlers.Users;
 using JCA.WorkSpace.Domain.Entities;
 using JCA.WorkSpace.Domain.Enums;
+using MassTransit;
 using Moq;
 
 namespace JCA.WorkSpace.Application.Tests.Handlers.Users;
@@ -20,7 +21,8 @@ public class CreateUserCommandHandlerTests
 
         _handler = new CreateUserCommandHandler(
             _fixture.UserRepositoryMock.Object,
-            _fixture.UnitOfWorkMock.Object
+            _fixture.UnitOfWorkMock.Object,
+            _fixture.PublishEndpointMock.Object
         );
     }
 

@@ -1,0 +1,30 @@
+services:
+
+  # ============================================================
+  # Serviço de Fila (Mensageria Assíncrona)
+  # Painel de gerenciamento: http://localhost:15672
+  # Login: workspace / workspace123
+  # ============================================================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: workspace_rabbitmq
+    ports:
+      - "5672:5672"    # Porta AMQP (usada pela API .NET internamente)
+      - "15672:15672"  # Porta do painel web de gerenciamento
+    environment:
+      RABBITMQ_DEFAULT_USER: workspace
+      RABBITMQ_DEFAULT_PASS: workspace123
+    restart: unless-stopped
+
+  # ============================================================
+  # Serviço de E-mail Falso para Testes
+  # Intercepta TODOS os e-mails sem enviar para ninguém real.
+  # Caixa de entrada visual: http://localhost:8025
+  # ============================================================
+  mailpit:
+    image: axllent/mailpit
+    container_name: workspace_mailpit
+    ports:
+      - "1025:1025"  # Porta SMTP (usada pela API .NET para "enviar" e-mails)
+      - "8025:8025"  # Porta da interface web (caixa de e-mails de teste)
+    restart: unless-stopped

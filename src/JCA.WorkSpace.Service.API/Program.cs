@@ -1,5 +1,7 @@
 using System.Text;
 using JCA.WorkSpace.Infrastructure.CrossCutting.IoC;
+using JCA.WorkSpace.Service.API.Consumers;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +15,32 @@ builder.Services.AddHealthChecks();
 builder.Services.AddHostedService<JCA.WorkSpace.Service.API.Workers.NoShowWorker>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+
+// Registro do MassTransit com RabbitMQ
+// O WelcomeEmailConsumer fica escutando a fila e envia o e-mail quando chega uma mensagem
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<WelcomeEmailConsumer>();
+    x.AddConsumer<AccessRequestPendingConsumer>();
+    x.AddConsumer<AccessRequestApprovedConsumer>();
+    x.AddConsumer<AccessRequestRejectedConsumer>();
+
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        var rabbit = builder.Configuration.GetSection("RabbitMq");
+
+        cfg.Host(rabbit["Host"] ?? "localhost", rabbit["VirtualHost"] ?? "/", h =>
+        {
+            h.Username(rabbit["Username"] ?? "guest");
+            h.Password(rabbit["Password"] ?? "guest");
+        });
+
+        // Configura retentativa automática em caso de falha no envio de e-mail
+        cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+
+        cfg.ConfigureEndpoints(ctx);
+    });
+});
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

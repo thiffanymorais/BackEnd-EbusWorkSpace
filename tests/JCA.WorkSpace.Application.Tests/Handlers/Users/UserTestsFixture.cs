@@ -3,6 +3,7 @@ using JCA.WorkSpace.Domain.Entities;
 using JCA.WorkSpace.Domain.Enums;
 using JCA.WorkSpace.Domain.Interfaces;
 using JCA.WorkSpace.Domain.Interfaces.Repositories;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -15,6 +16,7 @@ public class UserTestsFixture
     public Mock<IUnitOfWork> UnitOfWorkMock { get; set; }
     public Mock<IConfiguration> ConfigurationMock { get; set; }
     public Mock<IMapper> MapperMock { get; set; }
+    public Mock<IPublishEndpoint> PublishEndpointMock { get; set; }
 
     public UserTestsFixture()
     {
@@ -23,6 +25,7 @@ public class UserTestsFixture
         UnitOfWorkMock = new Mock<IUnitOfWork>();
         ConfigurationMock = new Mock<IConfiguration>();
         MapperMock = new Mock<IMapper>();
+        PublishEndpointMock = new Mock<IPublishEndpoint>();
     }
 
     public void ResetMocks()
@@ -32,6 +35,7 @@ public class UserTestsFixture
         UnitOfWorkMock.Reset();
         ConfigurationMock.Reset();
         MapperMock.Reset();
+        PublishEndpointMock.Reset();
 
         UnitOfWorkMock.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 

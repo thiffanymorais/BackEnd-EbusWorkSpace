@@ -3,6 +3,8 @@ using JCA.WorkSpace.Domain.Entities;
 using JCA.WorkSpace.Domain.Interfaces;
 using JCA.WorkSpace.Domain.Interfaces.Repositories;
 using JCA.WorkSpace.Application.Commands.Users;
+using JCA.WorkSpace.Domain.Messages;
+using MassTransit;
 
 namespace JCA.WorkSpace.Application.Handlers.Users;
 
@@ -10,13 +12,16 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public CreateUserCommandHandler(
         IUserRepository userRepository, 
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IPublishEndpoint publishEndpoint)
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -41,7 +46,17 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
         await _userRepository.AddAsync(user);
         await _unitOfWork.CommitAsync();
 
-        // 4. Retorno
+        // Publica o evento na fila do RabbitMQ
+        // O WelcomeEmailConsumer vai pegar esta mensagem e enviar o e-mail de boas-vindas
+        await _publishEndpoint.Publish(new SendWelcomeEmailMessage
+        {
+            UserId = user.Id,
+            RecipientName = user.Name,
+            RecipientEmail = user.Email,
+            Role = user.Profile.ToString(),
+            Sector = user.Sector
+        });
+
         return user.Id;
     }
 }
